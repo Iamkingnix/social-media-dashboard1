@@ -4,7 +4,6 @@ import {
   Text,
   StyleSheet,
   TouchableOpacity,
-  Platform,
   StyleProp,
   ViewStyle,
 } from 'react-native';
@@ -52,8 +51,8 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
       <TouchableOpacity
         style={[
           styles.button,
-          error && styles.buttonError,
-          value && styles.buttonSelected,
+          error ? styles.buttonError : null,
+          value ? styles.buttonSelected : null,
         ]}
         onPress={() => setDatePickerVisible(true)}
       >

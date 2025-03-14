@@ -1,79 +1,46 @@
 import React from 'react';
-import { View, Text, StyleSheet, Image } from 'react-native';
-import { PreviewBase } from './PreviewBase';
-import { PLATFORMS } from '../../constants/platforms';
+import { Text, View, StyleSheet } from 'react-native';
+import { PreviewBase, Platform } from './PreviewBase';
+import { ImageAsset } from '../../src/utils/imagePicker';
 import { colors } from '../../constants/colors';
+
+const TWITTER_PLATFORM: Platform = {
+  name: 'Twitter',
+  icon: 'twitter',
+  color: '#1DA1F2',
+};
 
 interface TwitterPreviewProps {
   text: string;
-  username?: string;
+  username: string;
+  images?: ImageAsset[];
 }
 
 export const TwitterPreview: React.FC<TwitterPreviewProps> = ({
   text,
-  username = 'Username',
+  username,
+  images,
 }) => {
-  const platform = PLATFORMS.find(p => p.id === 'twitter')!;
-  const remainingChars = 280 - text.length;
-
   return (
-    <PreviewBase platform={platform}>
-      <View style={styles.userInfo}>
-        <Image
-          source={{ uri: 'https://via.placeholder.com/40' }}
-          style={styles.avatar}
-        />
-        <View style={styles.names}>
-          <Text style={styles.name}>Display Name</Text>
-          <Text style={styles.username}>@{username}</Text>
-        </View>
+    <PreviewBase platform={TWITTER_PLATFORM} images={images}>
+      <View style={styles.content}>
+        <Text style={styles.username}>@{username}</Text>
+        <Text style={styles.text}>{text}</Text>
       </View>
-      <Text style={styles.text}>{text}</Text>
-      <Text style={[
-        styles.charCount,
-        remainingChars < 0 && styles.charCountError
-      ]}>
-        {remainingChars}
-      </Text>
     </PreviewBase>
   );
 };
 
 const styles = StyleSheet.create({
-  userInfo: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 12,
-  },
-  avatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-  },
-  names: {
-    marginLeft: 12,
-  },
-  name: {
-    fontWeight: '600',
-    fontSize: 15,
-    color: colors.text.primary,
+  content: {
+    gap: 8,
   },
   username: {
-    fontSize: 14,
     color: colors.text.secondary,
+    fontSize: 14,
   },
   text: {
-    fontSize: 15,
     color: colors.text.primary,
-    lineHeight: 20,
-  },
-  charCount: {
-    fontSize: 12,
-    color: colors.text.secondary,
-    marginTop: 8,
-    textAlign: 'right',
-  },
-  charCountError: {
-    color: colors.error,
+    fontSize: 16,
   },
 });

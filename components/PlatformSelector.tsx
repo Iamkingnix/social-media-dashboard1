@@ -1,103 +1,91 @@
 import React from 'react';
-import {
-  View,
-  Text,
-  StyleSheet,
-  TouchableOpacity,
-  StyleProp,
-  ViewStyle,
-} from 'react-native';
+import { View, StyleSheet, TouchableOpacity, Text } from 'react-native';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
-import { Platform, PLATFORMS } from '../constants/platforms';
+import { PLATFORMS } from '../constants/platforms';
+import type { Platform } from './previews/PreviewBase';
 import { colors } from '../constants/colors';
 
 interface PlatformSelectorProps {
   selectedPlatforms: string[];
   onSelectPlatform: (platformId: string) => void;
-  style?: StyleProp<ViewStyle>;
 }
 
 export const PlatformSelector: React.FC<PlatformSelectorProps> = ({
   selectedPlatforms,
   onSelectPlatform,
-  style,
 }) => {
-  const renderPlatform = (platform: Platform) => {
-    const isSelected = selectedPlatforms.includes(platform.id);
-
-    return (
-      <TouchableOpacity
-        key={platform.id}
-        style={[
-          styles.platformButton,
-          isSelected && { backgroundColor: platform.color },
-        ]}
-        onPress={() => onSelectPlatform(platform.id)}
-      >
-        <MaterialCommunityIcons
-          name={platform.icon as any}
-          size={24}
-          color={isSelected ? '#FFFFFF' : platform.color}
-        />
-        <Text
-          style={[
-            styles.platformName,
-            isSelected && styles.platformNameSelected,
-          ]}
-        >
-          {platform.name}
-        </Text>
-        {isSelected && (
-          <MaterialCommunityIcons
-            name="check"
-            size={16}
-            color="#FFFFFF"
-            style={styles.checkIcon}
-          />
-        )}
-      </TouchableOpacity>
-    );
-  };
+  const currentDate = new Date('2025-03-14T14:56:04Z'); // Using provided UTC time
 
   return (
-    <View style={[styles.container, style]}>
+    <View style={styles.container}>
       <Text style={styles.label}>Select Platforms</Text>
-      <View style={styles.platformsGrid}>
-        {PLATFORMS.map(renderPlatform)}
+      <View style={styles.platforms}>
+        {Object.entries(PLATFORMS).map(([id, platform]) => {
+          const isSelected = selectedPlatforms.includes(id);
+          return (
+            <TouchableOpacity
+              key={id}
+              style={[
+                styles.platform,
+                isSelected && { backgroundColor: platform.color },
+              ]}
+              onPress={() => onSelectPlatform(id)}
+            >
+              <MaterialCommunityIcons
+                name={platform.icon as any}
+                size={24}
+                color={isSelected ? '#FFFFFF' : platform.color}
+              />
+              <Text
+                style={[
+                  styles.platformName,
+                  isSelected && styles.platformNameSelected,
+                ]}
+              >
+                {platform.name}
+              </Text>
+              {isSelected && (
+                <MaterialCommunityIcons
+                  name="check-circle"
+                  size={16}
+                  color="#FFFFFF"
+                  style={styles.checkIcon}
+                />
+              )}
+            </TouchableOpacity>
+          );
+        })}
       </View>
-      {selectedPlatforms.length === 0 && (
-        <Text style={styles.error}>
-          Please select at least one platform
-        </Text>
-      )}
+      <Text style={styles.helperText}>
+        Select the platforms where you want to share your post
+      </Text>
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
+    marginBottom: 24,
   },
   label: {
-    fontSize: 14,
-    color: colors.text.secondary,
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text.primary,
     marginBottom: 8,
   },
-  platformsGrid: {
+  platforms: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    margin: -4,
+    gap: 8,
   },
-  platformButton: {
+  platform: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.surface,
     borderRadius: 8,
-    padding: 8,
-    margin: 4,
-    borderWidth: 1,
-    borderColor: colors.border.default,
-    minWidth: '45%',
+    padding: 12,
+    minWidth: '48%',
+    flex: 1,
   },
   platformName: {
     marginLeft: 8,
@@ -111,9 +99,9 @@ const styles = StyleSheet.create({
   checkIcon: {
     marginLeft: 4,
   },
-  error: {
-    color: colors.error,
+  helperText: {
     fontSize: 12,
-    marginTop: 4,
+    color: colors.text.secondary,
+    marginTop: 8,
   },
 });
