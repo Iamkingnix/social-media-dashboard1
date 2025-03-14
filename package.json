@@ -1,35 +1,40 @@
 {
   "name": "social-media-dashboard",
   "version": "1.0.0",
-  "main": "index.ts",
+  "main": "expo-router/entry",
   "scripts": {
     "start": "expo start",
     "android": "expo start --android",
     "ios": "expo start --ios",
-    "web": "expo start --web"
+    "web": "expo start --web",
+    "test": "jest",
+    "lint": "eslint .",
+    "type-check": "tsc --noEmit"
   },
   "dependencies": {
-    "@react-native-async-storage/async-storage": "^2.1.2",
-    "@react-native-community/datetimepicker": "^8.3.0",
-    "expo": "~52.0.38",
-    "expo-router": "^4.0.18",
-    "expo-status-bar": "~2.0.1",
-    "react": "18.3.1",
-    "react-native": "0.76.7",
-    "react-native-calendars": "^1.1310.0",
+    "@react-native-async-storage/async-storage": "^1.21.0",
+    "@react-native-community/datetimepicker": "^7.6.2",
+    "expo": "~50.0.0",
+    "expo-router": "^3.4.0",
+    "expo-status-bar": "~1.11.1",
+    "react": "18.2.0",
+    "react-native": "0.73.2",
+    "react-native-calendars": "^1.1303.0",
     "react-native-chart-kit": "^6.12.0",
-    "zustand": "^5.0.3"
+    "react-native-safe-area-context": "^4.8.2",
+    "react-native-screens": "^3.29.0",
+    "zustand": "^4.5.0"
   },
   "devDependencies": {
-    "@babel/core": "^7.25.2",
-    "@types/react": "~18.3.12",
-    "@typescript-eslint/eslint-plugin": "^8.26.1",
-    "@typescript-eslint/parser": "^8.26.1",
-    "eslint": "^9.22.0",
-    "eslint-plugin-react": "^7.37.4",
-    "eslint-plugin-react-hooks": "^5.2.0",
+    "@babel/core": "^7.20.0",
+    "@types/react": "~18.2.45",
+    "@typescript-eslint/eslint-plugin": "^6.21.0",
+    "@typescript-eslint/parser": "^6.21.0",
+    "eslint": "^8.56.0",
+    "eslint-plugin-react": "^7.33.2",
+    "eslint-plugin-react-hooks": "^4.6.0",
     "jest": "^29.7.0",
-    "typescript": "^5.3.3"
+    "typescript": "^5.3.0"
   },
   "private": true
 }
