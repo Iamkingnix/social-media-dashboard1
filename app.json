@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "social-media-dashboard",
-    "slug": "social-media-dashboard",
+    "name": "social-media-dashboard1",
+    "slug": "social-media-dashboard1",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -16,55 +16,26 @@
     ],
     "ios": {
       "supportsTablet": true,
-      "bundleIdentifier": "com.Iamkingnix.socialmediaposts",
-      "infoPlist": {
-        "NSPhotoLibraryUsageDescription": "Allow Social Media Dashboard to access your photos for sharing on social media",
-        "NSCameraUsageDescription": "Allow Social Media Dashboard to access your camera for taking photos to share"
-      }
+      "bundleIdentifier": "com.Iamkingnix.socialmediaposts"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.Iamkingnix.socialmediaposts",
-      "permissions": [
-        "CAMERA",
-        "READ_EXTERNAL_STORAGE",
-        "WRITE_EXTERNAL_STORAGE"
-      ]
+      "package": "com.Iamkingnix.socialmediaposts"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "plugins": [
       [
-        "expo-image-picker",
+        "expo-notifications",
         {
-          "photosPermission": "The app needs access to your photos to let you share them on social media.",
-          "cameraPermission": "The app needs access to your camera to take photos for sharing."
-        }
-      ],
-      [
-        "@react-native-community/datetimepicker",
-        {
-          "mode": "datetime"
+          "icon": "./assets/notification-icon.png",
+          "color": "#ffffff"
         }
       ]
-    ],
-    "extra": {
-      "eas": {
-        "projectId": "social-media-dashboard"
-      }
-    },
-    "owner": "Iamkingnix",
-    "runtimeVersion": {
-      "policy": "appVersion"
-    },
-    "updates": {
-      "url": "https://u.expo.dev/social-media-dashboard",
-      "enabled": true,
-      "fallbackToCacheTimeout": 0
-    }
+    ]
   }
 }
