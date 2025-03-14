@@ -1,73 +1,114 @@
-import React, { useState } from 'react';
-import { View, ScrollView, StyleSheet, RefreshControl } from 'react-native';
+import React from 'react';
+import { View, StyleSheet, ScrollView } from 'react-native';
 import { useRouter } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
 import { colors } from '../../../constants/colors';
-import { ContentCard } from '../../../components/ContentCard';
-import { EmptyState } from '../../../components/EmptyState';
-import { useContentStore } from '../../../store/content-store';
 import { Button } from '../../../components/Button';
-import { Ionicons } from '@expo/vector-icons';
+import { ContentCard } from '../../../components/ContentCard';
+
+// Define types for our content state
+interface ContentItem {
+  id: string;
+  title: string;
+  description: string;
+  platforms: string[];
+  scheduledDate?: string;
+  status: 'draft' | 'scheduled' | 'published';
+  mediaType?: 'text' | 'image' | 'video';
+}
+
+interface HomeState {
+  content: ContentItem[];
+  isLoading: boolean;
+  error: string | null;
+}
+
+// Initial state
+const initialState: HomeState = {
+  content: [],
+  isLoading: false,
+  error: null,
+};
 
 export default function HomeScreen() {
   const router = useRouter();
-  const [refreshing, setRefreshing] = useState(false);
-  const currentDate = new Date('2025-03-14T05:47:32Z');
-  
-  const contents = useContentStore((state) => state.items);
-  const [filter, setFilter] = useState('all'); // 'all', 'scheduled', 'published', 'draft'
+  const [state, setState] = React.useState<HomeState>(initialState);
 
-  const filteredContents = contents.filter(content => {
-    if (filter === 'all') return true;
-    return content.status === filter;
-  });
+  React.useEffect(() => {
+    fetchContent();
+  }, []);
 
-  const handleRefresh = async () => {
-    setRefreshing(true);
-    // Implement refresh logic here
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setRefreshing(false);
+  const fetchContent = async () => {
+    setState((prevState) => ({ ...prevState, isLoading: true }));
+    try {
+      // TODO: Replace with your actual API call
+      const response = await fetch('YOUR_API_ENDPOINT/content');
+      const data = await response.json();
+
+      setState({
+        content: data,
+        isLoading: false,
+        error: null,
+      });
+    } catch (error) {
+      setState({
+        content: [],
+        isLoading: false,
+        error: error instanceof Error ? error.message : 'Failed to fetch content',
+      });
+    }
   };
 
-  if (contents.length === 0) {
-    return (
-      <EmptyState
-        title="Welcome to Your Content Hub"
-        description="Start creating and sharing content across your social media platforms."
-        actionLabel="Create First Post"
-        onAction={() => router.push('/create')}
-        icon={<Ionicons name="add-circle-outline" size={48} color={colors.primary} />}
-      />
-    );
-  }
+  const handleContentPress = (contentId: string) => {
+    router.push(`/content/${contentId}`);
+  };
 
   return (
     <View style={styles.container}>
-      <View style={styles.filterContainer}>
-        {['all', 'scheduled', 'published', 'draft'].map((filterOption) => (
+      <StatusBar style="light" />
+      
+      <ScrollView 
+        style={styles.scrollView}
+        contentContainerStyle={styles.content}
+      >
+        <View style={styles.header}>
           <Button
-            key={filterOption}
-            title={filterOption.charAt(0).toUpperCase() + filterOption.slice(1)}
-            variant={filter === filterOption ? 'primary' : 'outline'}
-            onPress={() => setFilter(filterOption)}
-            style={styles.filterButton}
+            title="Create New Post"
+            onPress={() => router.push('/new-post')}
+            style={styles.createButton}
+          />
+        </View>
+
+        {state.content.map((item) => (
+          <ContentCard
+            key={item.id}
+            content={item}
+            onPress={() => handleContentPress(item.id)}
           />
         ))}
-      </View>
+      </ScrollView>
+    </View>
+  );
+}
 
-      <ScrollView
-        refreshControl={
-          <RefreshControl
-            refreshing={refreshing}
-            onRefresh={handleRefresh}
-            tintColor={colors.primary}
-          />
-        }
-        style={styles.contentList}
-      >
-        {filteredContents.map((content) => (
-          <ContentCard
-            key={content.id}
-            content={content}
-            onPress={() => router.push({
-              pathname: '/content-details',
-              params
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.background,
+  },
+  scrollView: {
+    flex: 1,
+  },
+  content: {
+    padding: 16,
+    paddingBottom: 32,
+  },
+  header: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    marginBottom: 16,
+  },
+  createButton: {
+    minWidth: 120,
+  },
+});

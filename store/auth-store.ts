@@ -1,12 +1,11 @@
-import create from 'zustand';
-import { persist } from 'zustand/middleware';
+import { create } from 'zustand';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 interface User {
   id: string;
+  username: string;
   email: string;
-  name: string;
-  avatar?: string;
+  // Add any other user properties you need
 }
 
 interface AuthState {
@@ -15,74 +14,68 @@ interface AuthState {
   isLoading: boolean;
   error: string | null;
   login: (email: string, password: string) => Promise<void>;
-  signup: (email: string, password: string, name: string) => Promise<void>;
-  logout: () => void;
-  updateProfile: (data: Partial<User>) => Promise<void>;
+  logout: () => Promise<void>;
+  clearError: () => void;
 }
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
-      user: null,
-      token: null,
-      isLoading: false,
-      error: null,
+export const useAuthStore = create<AuthState>((set) => ({
+  user: null,
+  token: null,
+  isLoading: false,
+  error: null,
 
-      login: async (email, password) => {
-        set({ isLoading: true, error: null });
-        try {
-          // Implement actual API call here
-          const response = await fetch('/api/login', {
-            method: 'POST',
-            body: JSON.stringify({ email, password }),
-          });
-          const data = await response.json();
-          set({ user: data.user, token: data.token, isLoading: false });
-        } catch (error) {
-          set({ error: 'Login failed', isLoading: false });
-        }
-      },
+  login: async (email: string, password: string) => {
+    set({ isLoading: true, error: null });
+    try {
+      // TODO: Replace with your actual API call
+      const response = await fetch('YOUR_API_ENDPOINT/login', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ email, password }),
+      });
 
-      signup: async (email, password, name) => {
-        set({ isLoading: true, error: null });
-        try {
-          // Implement actual API call here
-          const response = await fetch('/api/signup', {
-            method: 'POST',
-            body: JSON.stringify({ email, password, name }),
-          });
-          const data = await response.json();
-          set({ user: data.user, token: data.token, isLoading: false });
-        } catch (error) {
-          set({ error: 'Signup failed', isLoading: false });
-        }
-      },
+      const data = await response.json();
 
-      logout: () => {
-        set({ user: null, token: null });
-      },
+      if (!response.ok) {
+        throw new Error(data.message || 'Failed to login');
+      }
 
-      updateProfile: async (data) => {
-        set({ isLoading: true, error: null });
-        try {
-          // Implement actual API call here
-          const response = await fetch('/api/profile', {
-            method: 'PUT',
-            body: JSON.stringify(data),
-          });
-          const updatedUser = await response.json();
-          set((state) => ({
-            user: { ...state.user, ...updatedUser },
-            isLoading: false,
-          }));
-        } catch (error) {
-          set({ error: 'Profile update failed', isLoading: false });
-        }
-      },
-    }),
-    {
-      name: 'auth-storage',
-      getStorage: () => AsyncStorage,
+      // Store token in AsyncStorage
+      await AsyncStorage.setItem('auth_token', data.token);
+
+      set({
+        user: data.user,
+        token: data.token,
+        isLoading: false,
+      });
+    } catch (error) {
+      set({
+        error: error instanceof Error ? error.message : 'An error occurred during login',
+        isLoading: false,
+      });
     }
-  )
-);
+  },
+
+  logout: async () => {
+    set({ isLoading: true });
+    try {
+      // Clear token from AsyncStorage
+      await AsyncStorage.removeItem('auth_token');
+      
+      set({
+        user: null,
+        token: null,
+        isLoading: false,
+      });
+    } catch (error) {
+      set({
+        error: 'Failed to logout',
+        isLoading: false,
+      });
+    }
+  },
+
+  clearError: () => set({ error: null }),
+}));

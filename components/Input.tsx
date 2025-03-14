@@ -38,7 +38,7 @@ export const Input = forwardRef<TextInput, InputProps>(({
         ref={ref}
         style={[
           styles.input,
-          error && styles.inputError,
+          error ? { borderColor: colors.error } : undefined,
           inputStyle,
         ]}
         placeholderTextColor={colors.text.placeholder}
@@ -70,9 +70,6 @@ const styles = StyleSheet.create({
     padding: 12,
     fontSize: 16,
     color: colors.text.primary,
-  },
-  inputError: {
-    borderColor: colors.error,
   },
   error: {
     color: colors.error,

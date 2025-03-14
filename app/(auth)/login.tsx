@@ -1,113 +1,94 @@
 import React, { useState } from 'react';
-import { View, Text, StyleSheet, Image, KeyboardAvoidingView, Platform } from 'react-native';
-import { Link, useRouter } from 'expo-router';
-import { colors } from '../../constants/colors';
+import {
+  View,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+  KeyboardAvoidingView,
+  Platform,
+  Alert,
+} from 'react-native';
+import { useRouter } from 'expo-router';
+import { StatusBar } from 'expo-status-bar';
+import { useAuthStore } from '../../store/auth-store';
 import { Button } from '../../components/Button';
 import { Input } from '../../components/Input';
-import { useAuthStore } from '../../store/auth-store';
+import { colors } from '../../constants/colors';
 
 export default function LoginScreen() {
   const router = useRouter();
-  const login = useAuthStore((state) => state.login);
-  const isLoading = useAuthStore((state) => state.isLoading);
-  const error = useAuthStore((state) => state.error);
-
+  const { login, error, isLoading, clearError } = useAuthStore();
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [validationError, setValidationError] = useState('');
+
+  // Clear any previous errors when the component mounts
+  React.useEffect(() => {
+    clearError();
+  }, [clearError]);
+
+  // Show error alert if login fails
+  React.useEffect(() => {
+    if (error) {
+      Alert.alert('Login Error', error);
+    }
+  }, [error]);
 
   const handleLogin = async () => {
-    // Basic validation
     if (!email || !password) {
-      setValidationError('Please fill in all fields');
+      Alert.alert('Validation Error', 'Please fill in all fields');
       return;
     }
-
-    if (!email.includes('@')) {
-      setValidationError('Please enter a valid email');
-      return;
-    }
-
-    setValidationError('');
-    try {
-      await login(email, password);
-      router.replace('/(tabs)/(home)');
-    } catch (err) {
-      // Error is handled by the store
-    }
+    
+    await login(email, password);
+    // If login is successful, the auth store will update and the _layout.tsx will handle navigation
   };
 
   return (
-    <KeyboardAvoidingView
+    <KeyboardAvoidingView 
+      style={styles.container} 
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-      style={styles.container}
     >
+      <StatusBar style="light" />
+      
       <View style={styles.content}>
-        <View style={styles.header}>
-          <Image
-            source={require('../../assets/logo.png')}
-            style={styles.logo}
-            resizeMode="contain"
-          />
-          <Text style={styles.title}>Welcome Back</Text>
-          <Text style={styles.subtitle}>
-            Sign in to your account to continue
-          </Text>
-        </View>
+        <Text style={styles.title}>Welcome Back</Text>
+        <Text style={styles.subtitle}>Sign in to continue</Text>
 
         <View style={styles.form}>
           <Input
             label="Email"
-            placeholder="Enter your email"
             value={email}
             onChangeText={setEmail}
-            autoCapitalize="none"
+            placeholder="Enter your email"
             keyboardType="email-address"
-            error={validationError && !email ? 'Email is required' : ''}
+            autoCapitalize="none"
+            autoComplete="email"
           />
 
           <Input
             label="Password"
-            placeholder="Enter your password"
             value={password}
             onChangeText={setPassword}
+            placeholder="Enter your password"
             secureTextEntry
-            error={validationError && !password ? 'Password is required' : ''}
+            autoComplete="password"
           />
 
-          {(error || validationError) && (
-            <Text style={styles.errorText}>{error || validationError}</Text>
-          )}
-
           <Button
-            title="Sign In"
+            title={isLoading ? "Signing in..." : "Sign In"}
             onPress={handleLogin}
+            disabled={isLoading}
             style={styles.loginButton}
-            isLoading={isLoading}
           />
 
-          <Text style={styles.orText}>or</Text>
-
-          <Button
-            title="Continue with Google"
-            variant="outline"
-            onPress={() => {/* Implement Google OAuth */}}
-            style={styles.socialButton}
-          />
-
-          <Button
-            title="Continue with Apple"
-            variant="outline"
-            onPress={() => {/* Implement Apple OAuth */}}
-            style={styles.socialButton}
-          />
-        </View>
-
-        <View style={styles.footer}>
-          <Text style={styles.footerText}>Don't have an account? </Text>
-          <Link href="/signup" asChild>
-            <Text style={styles.footerLink}>Sign Up</Text>
-          </Link>
+          <TouchableOpacity 
+            onPress={() => router.push("/signup")}
+            style={styles.signupLink}
+          >
+            <Text style={styles.signupText}>
+              Don't have an account? <Text style={styles.signupButtonText}>Sign Up</Text>
+            </Text>
+          </TouchableOpacity>
         </View>
       </View>
     </KeyboardAvoidingView>
@@ -121,20 +102,11 @@ const styles = StyleSheet.create({
   },
   content: {
     flex: 1,
-    padding: 24,
+    padding: 20,
     justifyContent: 'center',
   },
-  header: {
-    alignItems: 'center',
-    marginBottom: 48,
-  },
-  logo: {
-    width: 120,
-    height: 120,
-    marginBottom: 24,
-  },
   title: {
-    fontSize: 24,
+    fontSize: 32,
     fontWeight: 'bold',
     color: colors.text.primary,
     marginBottom: 8,
@@ -142,36 +114,23 @@ const styles = StyleSheet.create({
   subtitle: {
     fontSize: 16,
     color: colors.text.secondary,
+    marginBottom: 32,
   },
   form: {
-    marginBottom: 24,
+    gap: 16,
   },
   loginButton: {
-    marginTop: 24,
-  },
-  orText: {
-    color: colors.text.secondary,
-    textAlign: 'center',
-    marginVertical: 16,
-  },
-  socialButton: {
-    marginBottom: 12,
-  },
-  errorText: {
-    color: colors.error,
-    fontSize: 14,
     marginTop: 8,
-    textAlign: 'center',
   },
-  footer: {
-    flexDirection: 'row',
-    justifyContent: 'center',
+  signupLink: {
+    marginTop: 16,
     alignItems: 'center',
   },
-  footerText: {
+  signupText: {
     color: colors.text.secondary,
+    fontSize: 14,
   },
-  footerLink: {
+  signupButtonText: {
     color: colors.primary,
     fontWeight: '600',
   },
