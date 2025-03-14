@@ -2,39 +2,58 @@ import React, { useState } from 'react';
 import {
   View,
   Text,
-  StyleSheet,
   TouchableOpacity,
-  StyleProp,
-  ViewStyle,
+  StyleSheet,
+  Platform,
+  DateTimePickerAndroid,
+  Modal,
 } from 'react-native';
-import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { colors } from '../constants/colors';
+import DateTimePicker from '@react-native-community/datetimepicker';
 
 interface DateTimePickerProps {
   value?: Date;
-  onChange: (date: Date) => void;
+  onChange: (date?: Date) => void;
   onClear?: () => void;
-  style?: StyleProp<ViewStyle>;
-  label?: string;
   minimumDate?: Date;
-  error?: string;
+  label?: string;
 }
 
-export const DateTimePicker: React.FC<DateTimePickerProps> = ({
+export const DateTimePickerComponent: React.FC<DateTimePickerProps> = ({
   value,
   onChange,
   onClear,
-  style,
-  label = 'Schedule Date & Time',
-  minimumDate = new Date(),
-  error,
+  minimumDate,
+  label = 'Select Date & Time',
 }) => {
-  const [isDatePickerVisible, setDatePickerVisible] = useState(false);
+  const [isPickerVisible, setPickerVisible] = useState(false);
+  const currentDate = new Date('2025-03-14T15:08:31Z'); // Using provided UTC time
 
-  const handleConfirm = (date: Date) => {
-    setDatePickerVisible(false);
-    onChange(date);
+  const showPicker = () => {
+    if (Platform.OS === 'android') {
+      DateTimePickerAndroid.open({
+        value: value || currentDate,
+        onChange: (event, selectedDate) => {
+          if (event.type === 'set' && selectedDate) {
+            onChange(selectedDate);
+          }
+        },
+        mode: 'datetime',
+        minimumDate,
+      });
+    } else {
+      setPickerVisible(true);
+    }
+  };
+
+  const handleIosChange = (event: any, selectedDate?: Date) => {
+    if (event.type === 'set' && selectedDate) {
+      onChange(selectedDate);
+      setPickerVisible(false);
+    } else if (event.type === 'dismissed') {
+      setPickerVisible(false);
+    }
   };
 
   const formatDateTime = (date: Date) => {
@@ -45,64 +64,98 @@ export const DateTimePicker: React.FC<DateTimePickerProps> = ({
   };
 
   return (
-    <View style={[styles.container, style]}>
-      {label && <Text style={styles.label}>{label}</Text>}
-      
-      <TouchableOpacity
-        style={[
-          styles.button,
-          error ? styles.buttonError : null,
-          value ? styles.buttonSelected : null,
-        ]}
-        onPress={() => setDatePickerVisible(true)}
-      >
-        <MaterialCommunityIcons
-          name="calendar-clock"
-          size={24}
-          color={value ? colors.primary : colors.text.secondary}
-        />
-        <Text style={[styles.buttonText, value && styles.buttonTextSelected]}>
-          {value ? formatDateTime(value) : 'Select date and time'}
-        </Text>
+    <View style={styles.container}>
+      <Text style={styles.label}>{label}</Text>
+      <View style={styles.pickerContainer}>
+        <TouchableOpacity
+          style={[styles.button, value && styles.buttonWithValue]}
+          onPress={showPicker}
+        >
+          <MaterialCommunityIcons
+            name="calendar-clock"
+            size={24}
+            color={value ? colors.text.primary : colors.text.secondary}
+          />
+          <Text
+            style={[
+              styles.placeholder,
+              value && styles.value,
+            ]}
+          >
+            {value ? formatDateTime(value) : 'Select date and time'}
+          </Text>
+        </TouchableOpacity>
+
         {value && onClear && (
           <TouchableOpacity
-            onPress={onClear}
             style={styles.clearButton}
-            hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}
+            onPress={onClear}
           >
             <MaterialCommunityIcons
               name="close-circle"
-              size={20}
+              size={24}
               color={colors.text.secondary}
             />
           </TouchableOpacity>
         )}
-      </TouchableOpacity>
+      </View>
 
-      {error && <Text style={styles.error}>{error}</Text>}
-
-      <DateTimePickerModal
-        isVisible={isDatePickerVisible}
-        mode="datetime"
-        onConfirm={handleConfirm}
-        onCancel={() => setDatePickerVisible(false)}
-        minimumDate={minimumDate}
-        date={value || new Date()}
-      />
+      {Platform.OS === 'ios' && (
+        <Modal
+          visible={isPickerVisible}
+          transparent
+          animationType="slide"
+        >
+          <View style={styles.modalContainer}>
+            <View style={styles.pickerWrapper}>
+              <View style={styles.pickerHeader}>
+                <TouchableOpacity
+                  onPress={() => setPickerVisible(false)}
+                >
+                  <Text style={styles.cancelButton}>Cancel</Text>
+                </TouchableOpacity>
+                <Text style={styles.pickerTitle}>Select Date & Time</Text>
+                <TouchableOpacity
+                  onPress={() => {
+                    onChange(value || currentDate);
+                    setPickerVisible(false);
+                  }}
+                >
+                  <Text style={styles.doneButton}>Done</Text>
+                </TouchableOpacity>
+              </View>
+              <DateTimePicker
+                value={value || currentDate}
+                mode="datetime"
+                display="spinner"
+                onChange={handleIosChange}
+                minimumDate={minimumDate}
+              />
+            </View>
+          </View>
+        </Modal>
+      )}
     </View>
   );
 };
 
 const styles = StyleSheet.create({
   container: {
-    marginBottom: 16,
+    marginBottom: 24,
   },
   label: {
-    fontSize: 14,
-    color: colors.text.secondary,
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text.primary,
     marginBottom: 8,
   },
+  pickerContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+  },
   button: {
+    flex: 1,
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: colors.surface,
@@ -110,28 +163,56 @@ const styles = StyleSheet.create({
     borderColor: colors.border.default,
     borderRadius: 8,
     padding: 12,
+    gap: 8,
   },
-  buttonError: {
-    borderColor: colors.error,
+  buttonWithValue: {
+    borderColor: colors.border.active,
   },
-  buttonSelected: {
-    borderColor: colors.primary,
-  },
-  buttonText: {
-    marginLeft: 8,
+  placeholder: {
+    flex: 1,
     fontSize: 16,
     color: colors.text.secondary,
-    flex: 1,
   },
-  buttonTextSelected: {
+  value: {
     color: colors.text.primary,
   },
   clearButton: {
-    padding: 4,
+    padding: 8,
   },
-  error: {
-    color: colors.error,
-    fontSize: 12,
-    marginTop: 4,
+  modalContainer: {
+    flex: 1,
+    justifyContent: 'flex-end',
+    backgroundColor: 'rgba(0, 0, 0, 0.5)',
+  },
+  pickerWrapper: {
+    backgroundColor: colors.surface,
+    borderTopLeftRadius: 16,
+    borderTopRightRadius: 16,
+    paddingBottom: 20,
+  },
+  pickerHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    padding: 16,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border.default,
+  },
+  pickerTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: colors.text.primary,
+  },
+  cancelButton: {
+    fontSize: 16,
+    color: colors.text.secondary,
+  },
+  doneButton: {
+    fontSize: 16,
+    color: colors.primary,
+    fontWeight: '600',
   },
 });
+
+// Export with a different name to avoid conflicts
+export { DateTimePickerComponent as DateTimePicker };

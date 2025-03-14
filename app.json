@@ -1,6 +1,6 @@
 {
   "expo": {
-    "name": "Social Media Dashboard",
+    "name": "social-media-dashboard",
     "slug": "social-media-dashboard",
     "version": "1.0.0",
     "orientation": "portrait",
@@ -16,9 +16,10 @@
     ],
     "ios": {
       "supportsTablet": true,
+      "bundleIdentifier": "com.Iamkingnix.socialmediaposts",
       "infoPlist": {
-        "NSPhotoLibraryUsageDescription": "Allow $(PRODUCT_NAME) to access your photos for sharing on social media",
-        "NSCameraUsageDescription": "Allow $(PRODUCT_NAME) to access your camera for taking photos to share"
+        "NSPhotoLibraryUsageDescription": "Allow Social Media Dashboard to access your photos for sharing on social media",
+        "NSCameraUsageDescription": "Allow Social Media Dashboard to access your camera for taking photos to share"
       }
     },
     "android": {
@@ -26,6 +27,7 @@
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#ffffff"
       },
+      "package": "com.Iamkingnix.socialmediaposts",
       "permissions": [
         "CAMERA",
         "READ_EXTERNAL_STORAGE",
@@ -42,7 +44,27 @@
           "photosPermission": "The app needs access to your photos to let you share them on social media.",
           "cameraPermission": "The app needs access to your camera to take photos for sharing."
         }
+      ],
+      [
+        "@react-native-community/datetimepicker",
+        {
+          "mode": "datetime"
+        }
       ]
-    ]
+    ],
+    "extra": {
+      "eas": {
+        "projectId": "social-media-dashboard"
+      }
+    },
+    "owner": "Iamkingnix",
+    "runtimeVersion": {
+      "policy": "appVersion"
+    },
+    "updates": {
+      "url": "https://u.expo.dev/social-media-dashboard",
+      "enabled": true,
+      "fallbackToCacheTimeout": 0
+    }
   }
 }

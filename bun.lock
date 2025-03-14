@@ -5,7 +5,7 @@
       "name": "social-media-dashboard",
       "dependencies": {
         "@react-native-async-storage/async-storage": "^1.21.0",
-        "@react-native-community/datetimepicker": "^7.6.2",
+        "@react-native-community/datetimepicker": "8.2.0",
         "@react-navigation/native": "^6.1.9",
         "@react-navigation/stack": "^6.3.20",
         "expo": "^52.0.38",
@@ -472,7 +472,7 @@
 
     "@react-native-community/cli-types": ["@react-native-community/cli-types@12.3.0", "", { "dependencies": { "joi": "^17.2.1" } }, "sha512-MgOkmrXH4zsGxhte4YqKL7d+N8ZNEd3w1wo56MZlhu5WabwCJh87wYpU5T8vyfujFLYOFuFK5jjlcbs8F4/WDw=="],
 
-    "@react-native-community/datetimepicker": ["@react-native-community/datetimepicker@7.7.0", "", { "dependencies": { "invariant": "^2.2.4" } }, "sha512-nYzZy4DQLRFUzKJShWzRleCaebmCJfZ1lIcFmZgMXJoiVuGJNw3OIGHSWmHhPETh3OhP1RO3to882d7WmDIyrA=="],
+    "@react-native-community/datetimepicker": ["@react-native-community/datetimepicker@8.2.0", "", { "dependencies": { "invariant": "^2.2.4" }, "peerDependencies": { "expo": ">=50.0.0", "react": "*", "react-native": "*", "react-native-windows": "*" }, "optionalPeers": ["expo", "react-native-windows"] }, "sha512-qrUPhiBvKGuG9Y+vOqsc56RPFcHa1SU2qbAMT0hfGkoFIj3FodE0VuPVrEa8fgy7kcD5NQmkZIKgHOBLV0+hWg=="],
 
     "@react-native/assets-registry": ["@react-native/assets-registry@0.73.1", "", {}, "sha512-2FgAbU7uKM5SbbW9QptPPZx8N9Ke2L7bsHb+EhAanZjFZunA9PaYtyjUQ1s7HD+zDVqOQIvjkpXSv7Kejd2tqg=="],
 

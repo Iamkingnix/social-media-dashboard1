@@ -1,8 +1,14 @@
 import React from 'react';
 import { Text, View, StyleSheet } from 'react-native';
-import { PreviewBase } from './PreviewBase';
+import { PreviewBase, Platform } from './PreviewBase';
 import { ImageAsset } from '../../src/utils/imagePicker';
 import { colors } from '../../constants/colors';
+
+const FACEBOOK_PLATFORM: Platform = {
+  name: 'Facebook',
+  icon: 'facebook',
+  color: '#1877F2',
+};
 
 interface FacebookPreviewProps {
   text: string;
@@ -16,10 +22,7 @@ export const FacebookPreview: React.FC<FacebookPreviewProps> = ({
   images,
 }) => {
   return (
-    <PreviewBase
-      platform={{ name: 'Facebook', icon: 'facebook', color: '#1877F2' }}
-      images={images}
-    >
+    <PreviewBase platform={FACEBOOK_PLATFORM} images={images}>
       <View style={styles.content}>
         <Text style={styles.username}>{username}</Text>
         <Text style={styles.text}>{text}</Text>

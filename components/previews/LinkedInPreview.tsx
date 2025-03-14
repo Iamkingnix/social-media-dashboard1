@@ -1,8 +1,14 @@
 import React from 'react';
 import { Text, View, StyleSheet } from 'react-native';
-import { PreviewBase } from './PreviewBase';
+import { PreviewBase, Platform } from './PreviewBase';
 import { ImageAsset } from '../../src/utils/imagePicker';
 import { colors } from '../../constants/colors';
+
+const LINKEDIN_PLATFORM: Platform = {
+  name: 'LinkedIn',
+  icon: 'linkedin',
+  color: '#0A66C2',
+};
 
 interface LinkedInPreviewProps {
   text: string;
@@ -16,10 +22,7 @@ export const LinkedInPreview: React.FC<LinkedInPreviewProps> = ({
   images,
 }) => {
   return (
-    <PreviewBase
-      platform={{ name: 'LinkedIn', icon: 'linkedin', color: '#0A66C2' }}
-      images={images}
-    >
+    <PreviewBase platform={LINKEDIN_PLATFORM} images={images}>
       <View style={styles.content}>
         <Text style={styles.username}>{username}</Text>
         <Text style={styles.text}>{text}</Text>
