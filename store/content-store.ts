@@ -1,96 +1,116 @@
-import create from 'zustand';
-import { persist } from 'zustand/middleware';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-import { ContentItem, ContentFilter } from '../types/content';
+import { create } from 'zustand';
+
+export interface ContentItem {
+  id: string;
+  title: string;
+  description: string;
+  platforms: string[];
+  scheduledDate?: string;
+  status: 'draft' | 'scheduled' | 'published';
+  mediaType?: 'text' | 'image' | 'video';
+  createdAt: string;
+  updatedAt: string;
+}
 
 interface ContentState {
   items: ContentItem[];
   isLoading: boolean;
   error: string | null;
-  filter: ContentFilter;
+  fetchContent: () => Promise<void>;
   createContent: (content: Omit<ContentItem, 'id' | 'createdAt' | 'updatedAt'>) => Promise<void>;
-  updateContent: (id: string, content: Partial<ContentItem>) => Promise<void>;
+  updateContent: (id: string, updates: Partial<ContentItem>) => Promise<void>;
   deleteContent: (id: string) => Promise<void>;
-  setFilter: (filter: ContentFilter) => void;
-  getFilteredContent: () => ContentItem[];
 }
 
-export const useContentStore = create<ContentState>()(
-  persist(
-    (set, get) => ({
-      items: [],
-      isLoading: false,
-      error: null,
-      filter: {},
+export const useContentStore = create<ContentState>((set, get) => ({
+  items: [],
+  isLoading: false,
+  error: null,
 
-      createContent: async (content) => {
-        set({ isLoading: true, error: null });
-        try {
-          const newContent: ContentItem = {
-            ...content,
-            id: Date.now().toString(),
-            createdAt: new Date().toISOString(),
-            updatedAt: new Date().toISOString(),
-          };
-          set((state) => ({
-            items: [...state.items, newContent],
-            isLoading: false,
-          }));
-        } catch (error) {
-          set({ error: 'Failed to create content', isLoading: false });
-        }
-      },
-
-      updateContent: async (id, content) => {
-        set({ isLoading: true, error: null });
-        try {
-          set((state) => ({
-            items: state.items.map((item) =>
-              item.id === id
-                ? { ...item, ...content, updatedAt: new Date().toISOString() }
-                : item
-            ),
-            isLoading: false,
-          }));
-        } catch (error) {
-          set({ error: 'Failed to update content', isLoading: false });
-        }
-      },
-
-      deleteContent: async (id) => {
-        set({ isLoading: true, error: null });
-        try {
-          set((state) => ({
-            items: state.items.filter((item) => item.id !== id),
-            isLoading: false,
-          }));
-        } catch (error) {
-          set({ error: 'Failed to delete content', isLoading: false });
-        }
-      },
-
-      setFilter: (filter) => {
-        set({ filter });
-      },
-
-      getFilteredContent: () => {
-        const { items, filter } = get();
-        return items.filter((item) => {
-          if (filter.status && item.status !== filter.status) return false;
-          if (filter.platform && !item.platforms.includes(filter.platform)) return false;
-          if (filter.dateRange) {
-            const itemDate = new Date(item.scheduledDate || item.createdAt);
-            const start = new Date(filter.dateRange.start);
-            const end = new Date(filter.dateRange.end);
-            if (itemDate < start || itemDate > end) return false;
-          }
-          return true;
-        });
-      },
-    }),
-    {
-      name: 'content-storage',
-      getStorage: () => AsyncStorage,
+  fetchContent: async () => {
+    set({ isLoading: true });
+    try {
+      // TODO: Replace with your actual API call
+      const response = await fetch('YOUR_API_ENDPOINT/content');
+      const data = await response.json();
+      
+      set({ items: data, error: null });
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'Failed to fetch content' });
+    } finally {
+      set({ isLoading: false });
     }
-  )
-);
+  },
+
+  createContent: async (content) => {
+    set({ isLoading: true });
+    try {
+      // TODO: Replace with your actual API call
+      const response = await fetch('YOUR_API_ENDPOINT/content', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(content),
+      });
+      const data = await response.json();
+      
+      set(state => ({
+        items: [...state.items, data],
+        error: null,
+      }));
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'Failed to create content' });
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  updateContent: async (id, updates) => {
+    set({ isLoading: true });
+    try {
+      // TODO: Replace with your actual API call
+      const response = await fetch(`YOUR_API_ENDPOINT/content/${id}`, {
+        method: 'PATCH',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(updates),
+      });
+      const data = await response.json();
+      
+      set(state => ({
+        items: state.items.map(item => 
+          item.id === id ? { ...item, ...data } : item
+        ),
+        error: null,
+      }));
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'Failed to update content' });
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+
+  deleteContent: async (id) => {
+    set({ isLoading: true });
+    try {
+      // TODO: Replace with your actual API call
+      await fetch(`YOUR_API_ENDPOINT/content/${id}`, {
+        method: 'DELETE',
+      });
+      
+      set(state => ({
+        items: state.items.filter(item => item.id !== id),
+        error: null,
+      }));
+    } catch (error) {
+      set({ error: error instanceof Error ? error.message : 'Failed to delete content' });
+      throw error;
+    } finally {
+      set({ isLoading: false });
+    }
+  },
+}));

@@ -1,38 +1,33 @@
-export type Platform = {
-    id: string;
-    name: string;
-    icon: string;
-    color: string;
-    authUrl: string;
-  };
-  
-  export const platforms: Platform[] = [
-    {
-      id: 'twitter',
-      name: 'Twitter',
-      icon: 'twitter',
-      color: '#1DA1F2',
-      authUrl: 'https://api.twitter.com/oauth/authorize',
-    },
-    {
-      id: 'linkedin',
-      name: 'LinkedIn',
-      icon: 'linkedin',
-      color: '#0A66C2',
-      authUrl: 'https://www.linkedin.com/oauth/v2/authorization',
-    },
-    {
-      id: 'instagram',
-      name: 'Instagram',
-      icon: 'instagram',
-      color: '#E4405F',
-      authUrl: 'https://api.instagram.com/oauth/authorize',
-    },
-    {
-      id: 'facebook',
-      name: 'Facebook',
-      icon: 'facebook',
-      color: '#1877F2',
-      authUrl: 'https://www.facebook.com/v12.0/dialog/oauth',
-    },
-  ];
+export interface Platform {
+  id: string;
+  name: string;
+  icon: string; // We'll use icon names from @expo/vector-icons
+  color: string;
+}
+
+export const PLATFORMS: Platform[] = [
+  {
+    id: 'twitter',
+    name: 'Twitter',
+    icon: 'twitter',
+    color: '#1DA1F2',
+  },
+  {
+    id: 'instagram',
+    name: 'Instagram',
+    icon: 'instagram',
+    color: '#E1306C',
+  },
+  {
+    id: 'facebook',
+    name: 'Facebook',
+    icon: 'facebook',
+    color: '#4267B2',
+  },
+  {
+    id: 'linkedin',
+    name: 'LinkedIn',
+    icon: 'linkedin',
+    color: '#0077B5',
+  },
+];
